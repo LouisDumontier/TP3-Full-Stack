@@ -1,5 +1,21 @@
-FROM eclipse-temurin:17-jdk
+# Build stage
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /build
+
+# Copy pom.xml first for better layer caching
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copy source and build
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Run stage
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY target/shop-app-0.0.1-SNAPSHOT.jar shop-app.jar
-ENTRYPOINT ["java","-jar","shop-app.jar"]
+
+# Copy the JAR from build stage
+COPY --from=build /build/target/*.jar app.jar
+
 EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
