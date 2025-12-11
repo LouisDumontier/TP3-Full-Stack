@@ -1,4 +1,4 @@
-import { createContext, JSX, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { Toaster } from '../components';
 import { Toast } from '../types';
 

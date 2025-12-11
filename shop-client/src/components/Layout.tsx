@@ -2,7 +2,6 @@ import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Loader from './Loader';
 import SwitchLanguage from './SwitchLanguage';
-import { JSX } from 'react';
 
 type Props = {
     children: JSX.Element;

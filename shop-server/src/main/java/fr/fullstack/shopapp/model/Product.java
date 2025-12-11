@@ -21,11 +21,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-
 @Entity
 @Table(name = "products")
-@Indexed(index = "shop_id")
 public class Product {
     @ManyToMany
     @JoinTable(name = "products_categories", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"), indexes = {
@@ -41,7 +38,6 @@ public class Product {
     @OneToMany(cascade = {
             CascadeType.ALL }, orphanRemoval = true)
     @Size(min = 1, message = "At least one name and one description must be provided")
-    @JoinColumn(name = "product_id")
     private List<@Valid LocalizedProduct> localizedProduct = new ArrayList<LocalizedProduct>();
 
     @Column(nullable = false)

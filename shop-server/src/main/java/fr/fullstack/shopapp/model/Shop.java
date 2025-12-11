@@ -21,7 +21,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
@@ -49,20 +48,22 @@ public class Shop {
     @Column(nullable = false)
     @Size(min = 1, max = 255, message = "Name must be between 1 and 255 characters")
     @NotNull(message = "Name may not be null")
-    @FullTextField
+    @FullTextField(analyzer="standard")
     private String name;
 
     @Formula(value = "(SELECT COUNT(*) FROM products p WHERE p.shop_id = id)")
     private Long nbProducts;
 
     @OneToMany(cascade = { CascadeType.ALL })
-    @JoinColumn(name = "shop_id")
     @NotOverlapping
     private List<@Valid OpeningHoursShop> openingHours = new ArrayList<OpeningHoursShop>();
 
     @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Product> products = new ArrayList<Product>();
+
+    public Shop() {
+    }
 
     public LocalDate getCreatedAt() {
         return createdAt;

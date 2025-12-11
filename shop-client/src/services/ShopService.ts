@@ -12,7 +12,6 @@ export function getShopsSorted(page: number, size: number, sort: string): Promis
 }
 
 export function getShopsFiltered(page: number, size: number, urlFilters: string): Promise<ResponseArray<Shop>> {
-    console.log(`${process.env.REACT_APP_API}/shops?page=${page}&size=${size}${urlFilters}`);
     return axios.get(`${process.env.REACT_APP_API}/shops?page=${page}&size=${size}${urlFilters}`);
 }
 
