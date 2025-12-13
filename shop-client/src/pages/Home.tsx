@@ -38,6 +38,7 @@ const Home = () => {
             promisedShops = ShopService.getShopsSorted(pageSelected, 9, sort);
         } else if (filters || searchLabel) {
             const completedFilters = filters + searchLabel ? '&label=' + searchLabel : '';
+            console.log(completedFilters);
             promisedShops = ShopService.getShopsFiltered(pageSelected, 9, completedFilters);
         } else {
             promisedShops = ShopService.getShops(pageSelected, 9);
@@ -53,7 +54,7 @@ const Home = () => {
 
     useEffect(() => {
         getShops();
-    }, [pageSelected, sort, filters]);
+    }, [pageSelected, sort, filters, searchLabel]);
 
     const handleChangePagination = (event: React.ChangeEvent<unknown>, value: number) => {
         setPageSelected(value - 1);
@@ -65,7 +66,7 @@ const Home = () => {
 
     const handleChangeSearchLabel = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchLabel(event.target.value);
-    }
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
@@ -110,10 +111,14 @@ const Home = () => {
                         <MenuItem value="createdAt">Date de création</MenuItem>
                         <MenuItem value="nbProducts">Nombre de produits</MenuItem>
                     </Select>
-                    <TextField id="filled-basic" label="Rechercher" variant="outlined" value={searchLabel} onChange={handleChangeSearchLabel}/>
+                    <TextField
+                        id="filled-basic"
+                        label="Rechercher"
+                        variant="outlined"
+                        value={searchLabel}
+                        onChange={handleChangeSearchLabel}
+                    />
                 </FormControl>
-
-            
 
                 <Filters setUrlFilters={setFilters} setSort={setSort} sort={sort} />
             </Box>
