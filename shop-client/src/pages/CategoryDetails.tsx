@@ -14,9 +14,14 @@ const CategoryDetails = () => {
     const [category, setCategory] = useState<Category | null>(null);
 
     const getCategory = (categoryId: string) => {
-        CategoryService.getCategory(categoryId).then((res) => {
-            setCategory(res.data);
-        });
+        CategoryService.getCategory(categoryId)
+            .then((res) => {
+                setCategory(res.data);
+            })
+            .catch((err) => {
+                console.error('Error loading category:', err);
+                setToast({ severity: 'error', message: 'Impossible de charger la catégorie' });
+            });
     };
 
     useEffect(() => {
@@ -50,12 +55,20 @@ const CategoryDetails = () => {
             elevation={1}
             sx={{
                 position: 'relative',
-                padding: 4,
+                padding: { xs: 2, sm: 3, md: 4 },
             }}
         >
             <ActionButtons handleDelete={handleDelete} handleEdit={handleEdit} />
 
-            <Typography variant="h3" sx={{ textAlign: 'center' }}>
+            <Typography
+                variant="h3"
+                sx={{
+                    textAlign: 'center',
+                    fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' },
+                    wordBreak: 'break-word',
+                    px: { xs: 1, sm: 0 },
+                }}
+            >
                 {category.name}
             </Typography>
         </Paper>

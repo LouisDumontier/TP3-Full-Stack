@@ -48,7 +48,7 @@ public class Shop {
     @Column(nullable = false)
     @Size(min = 1, max = 255, message = "Name must be between 1 and 255 characters")
     @NotNull(message = "Name may not be null")
-    @FullTextField(analyzer="standard")
+    @FullTextField(analyzer = "standard")
     private String name;
 
     @Formula(value = "(SELECT COUNT(*) FROM products p WHERE p.shop_id = id)")

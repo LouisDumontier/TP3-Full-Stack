@@ -34,6 +34,10 @@ const ShopProducts = ({ shopId }: Props) => {
                 setCount(res.data.totalPages);
                 setPage(res.data.pageable.pageNumber + 1);
             })
+            .catch((err) => {
+                console.error('Error loading products:', err);
+                setProducts([]);
+            })
             .finally(() => setLoading(false));
     };
 
@@ -46,17 +50,30 @@ const ShopProducts = ({ shopId }: Props) => {
     };
 
     return (
-        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+        <Box
+            sx={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: { xs: 3, sm: 4, md: 5 },
+            }}
+        >
             {/* Filters */}
             <Box
                 sx={{
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
+                    justifyContent: { xs: 'center', sm: 'flex-start' },
                 }}
             >
-                <FormControl sx={{ minWidth: 220 }}>
+                <FormControl
+                    sx={{
+                        minWidth: { xs: '100%', sm: 220 },
+                        maxWidth: { xs: 400, sm: 'none' },
+                    }}
+                >
                     <SelectPaginate
                         value={filter}
                         onChange={setFilter}
@@ -67,18 +84,40 @@ const ShopProducts = ({ shopId }: Props) => {
                 </FormControl>
             </Box>
 
-            <Grid container alignItems="center" rowSpacing={3} columnSpacing={3}>
+            {/* Products Grid */}
+            <Grid container alignItems="stretch" spacing={{ xs: 2, sm: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
                 {products?.map((product) => (
-                    <Grid item key={product.id} xs={4}>
+                    <Grid item key={product.id} xs={4} sm={4} md={4}>
                         <ProductCard product={product} />
                     </Grid>
                 ))}
             </Grid>
 
+            {/* Pagination or Empty Message */}
             {products?.length !== 0 ? (
-                <Pagination count={count} page={page} siblingCount={1} onChange={handleChangePagination} />
+                <Pagination
+                    count={count}
+                    page={page}
+                    // siblingCount={{ xs: 0, sm: 1 }}
+                    // size={{ xs: 'small', sm: 'medium' }}
+                    onChange={handleChangePagination}
+                    sx={{
+                        '& .MuiPagination-ul': {
+                            flexWrap: 'wrap',
+                            justifyContent: 'center',
+                        },
+                    }}
+                />
             ) : (
-                <Typography variant="h6" sx={{ mt: -4 }}>
+                <Typography
+                    variant="h6"
+                    sx={{
+                        mt: { xs: -2, sm: -3, md: -4 },
+                        fontSize: { xs: '1rem', sm: '1.25rem' },
+                        textAlign: 'center',
+                        px: 2,
+                    }}
+                >
                     Aucun produit correspondant
                 </Typography>
             )}

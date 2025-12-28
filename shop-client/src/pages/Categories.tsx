@@ -1,4 +1,4 @@
-import { Box, Fab, Grid, Pagination, Typography } from '@mui/material';
+import { Alert, Box, Fab, Grid, Pagination, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,14 +14,20 @@ const Categories = () => {
     const [count, setCount] = useState<number>(0);
     const [page, setPage] = useState<number>(0);
     const [pageSelected, setPageSelected] = useState<number>(0);
+    const [error, setError] = useState<string | null>(null);
 
     const getCategories = () => {
         setLoading(true);
+        setError(null);
         CategoryService.getCategories(pageSelected, 9)
             .then((res) => {
                 setCategories(res.data.content);
                 setCount(res.data.totalPages);
                 setPage(res.data.pageable.pageNumber + 1);
+            })
+            .catch((error) => {
+                setError(error.message || 'Unable to find categories');
+                setCategories(null);
             })
             .finally(() => setLoading(false));
     };
@@ -36,7 +42,14 @@ const Categories = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-            <Typography variant="h2">Les catégories</Typography>
+            <Typography
+                variant="h2"
+                sx={{
+                    typography: { xs: 'h4', sm: 'h3', md: 'h2' },
+                }}
+            >
+                Les catégories
+            </Typography>
 
             <Box
                 sx={{
@@ -52,8 +65,20 @@ const Categories = () => {
                 </Fab>
             </Box>
 
+            {error && (
+                <Alert severity="error" sx={{ width: '100%' }}>
+                    {error}
+                </Alert>
+            )}
+
             {/* Categories */}
-            <Grid container alignItems="center" rowSpacing={3} columnSpacing={3}>
+            <Grid
+                container
+                alignItems="stretch"
+                spacing={{ xs: 2, sm: 3, md: 4 }}
+                columns={{ xs: 4, sm: 8, md: 12 }}
+                sx={{ width: '100%' }}
+            >
                 {categories?.map((category) => (
                     <Grid item key={category.id} xs={4}>
                         <CategoryCard category={category} />

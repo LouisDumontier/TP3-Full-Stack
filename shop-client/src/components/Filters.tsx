@@ -111,10 +111,14 @@ const Filters = ({ setUrlFilters, setSort, sort }: Props) => {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DesktopDatePicker
                             label="Créée après"
-                            inputFormat="DD/MM/YYYY"
-                            value={filters.createdAfter}
+                            format="DD/MM/YYYY"
+                            value={filters.createdAfter ?? undefined}
                             onChange={(v: Dayjs | null) => handleChange('createdAfter', v)}
-                            renderInput={(params) => <TextField {...params} />}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true,
+                                },
+                            }}
                         />
                     </LocalizationProvider>
                 </DialogContent>
@@ -123,10 +127,14 @@ const Filters = ({ setUrlFilters, setSort, sort }: Props) => {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DesktopDatePicker
                             label="Créée avant"
-                            inputFormat="DD/MM/YYYY"
-                            value={filters.createdBefore}
+                            format="DD/MM/YYYY"
+                            value={filters.createdBefore ?? undefined}
                             onChange={(v: Dayjs | null) => handleChange('createdBefore', v)}
-                            renderInput={(params) => <TextField {...params} />}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true,
+                                },
+                            }}
                         />
                     </LocalizationProvider>
                 </DialogContent>

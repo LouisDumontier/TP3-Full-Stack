@@ -18,7 +18,20 @@ const ShopCard = ({ shop }: Props) => {
     };
 
     return (
-        <Card sx={{ minWidth: 275, cursor: 'pointer' }} onClick={handleClick}>
+        <Card
+            sx={{
+                cursor: 'pointer',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 4,
+                },
+            }}
+            onClick={handleClick}
+        >
             <CardContent>
                 <Typography variant="h4" color="text.primary" gutterBottom sx={{ textAlign: 'center' }}>
                     {shop.name}

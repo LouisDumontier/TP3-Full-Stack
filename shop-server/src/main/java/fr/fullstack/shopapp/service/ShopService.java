@@ -1,13 +1,17 @@
 package fr.fullstack.shopapp.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +20,7 @@ import fr.fullstack.shopapp.model.Shop;
 import fr.fullstack.shopapp.repository.ShopRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 public class ShopService {
@@ -61,6 +66,34 @@ public class ShopService {
         }
     }
 
+    // public Page<Shop> getShopList(
+    // Optional<String> sortBy,
+    // Optional<Boolean> inVacations,
+    // Optional<String> createdBefore,
+    // Optional<String> createdAfter,
+    // Optional<String> label,
+    // Pageable pageable) {
+
+    // // SORT
+    // if (sortBy.isPresent()) {
+    // return switch (sortBy.get()) {
+    // case "name" -> shopRepository.findByOrderByNameAsc(pageable);
+    // case "createdAt" -> shopRepository.findByOrderByCreatedAtAsc(pageable);
+    // default -> shopRepository.findByOrderByNbProductsAsc(pageable);
+    // };
+    // }
+
+    // // FILTERS
+    // Page<Shop> shopList = getShopListWithFilter(inVacations, createdBefore,
+    // createdAfter, label, pageable);
+    // if (shopList != null) {
+    // return shopList;
+    // }
+
+    // // NONE
+    // return shopRepository.findByOrderByIdAsc(pageable);
+    // }
+
     public Page<Shop> getShopList(
             Optional<String> sortBy,
             Optional<Boolean> inVacations,
@@ -68,23 +101,70 @@ public class ShopService {
             Optional<String> createdAfter,
             Optional<String> label,
             Pageable pageable) {
-        // SORT
+
+        if (label.isPresent()) {
+            Pageable searchPageable = pageable;
+            if (sortBy.isPresent()) {
+                String[] sortParts = sortBy.get().split(",");
+                String field = sortParts[0];
+                Sort.Direction direction = sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc")
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC;
+                searchPageable = PageRequest.of(
+                        pageable.getPageNumber(),
+                        pageable.getPageSize(),
+                        Sort.by(direction, field));
+            }
+            Page<Shop> elasticResults = elasticSearchService.searchShops(label.get(), searchPageable);
+            System.out.println("Elastic Results : " + elasticResults.getContent().size() + " for label " + label.get());
+
+            List<Shop> filteredResults = elasticResults.getContent().stream()
+                    .filter(shop -> inVacations.isEmpty() || shop.getInVacations() == (inVacations.get()))
+                    .filter(shop -> createdAfter.isEmpty() ||
+                            !shop.getCreatedAt().isBefore(LocalDate.parse(createdAfter.get())))
+                    .filter(shop -> createdBefore.isEmpty() ||
+                            !shop.getCreatedAt().isAfter(LocalDate.parse(createdBefore.get())))
+                    .toList();
+
+            return new PageImpl<>(filteredResults, pageable, elasticResults.getTotalElements());
+        }
+
+        Specification<Shop> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (inVacations.isPresent()) {
+                predicates.add(inVacations.get()
+                        ? cb.isTrue(root.get("inVacations"))
+                        : cb.isFalse(root.get("inVacations")));
+            }
+
+            if (createdBefore.isPresent()) {
+                LocalDate ld = LocalDate.parse(createdBefore.get());
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), ld));
+            }
+
+            if (createdAfter.isPresent()) {
+                LocalDate ld = LocalDate.parse(createdAfter.get());
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), ld));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Pageable finalPageable = pageable;
         if (sortBy.isPresent()) {
-            return switch (sortBy.get()) {
-                case "name" -> shopRepository.findByOrderByNameAsc(pageable);
-                case "createdAt" -> shopRepository.findByOrderByCreatedAtAsc(pageable);
-                default -> shopRepository.findByOrderByNbProductsAsc(pageable);
-            };
+            String[] sortParts = sortBy.get().split(",");
+            String field = sortParts[0];
+            Sort.Direction direction = sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc")
+                    ? Sort.Direction.DESC
+                    : Sort.Direction.ASC;
+            finalPageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(direction, field));
         }
 
-        // FILTERS
-        Page<Shop> shopList = getShopListWithFilter(inVacations, createdBefore, createdAfter, label, pageable);
-        if (shopList != null) {
-            return shopList;
-        }
-
-        // NONE
-        return shopRepository.findByOrderByIdAsc(pageable);
+        return shopRepository.findAll(spec, finalPageable);
     }
 
     @Transactional

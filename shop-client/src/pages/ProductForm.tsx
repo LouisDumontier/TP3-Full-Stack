@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Box, Button, Divider, FormControl, InputAdornment, Paper, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -56,6 +55,10 @@ const ProductForm = () => {
                 } else {
                     setProduct({ ...res.data, id: id });
                 }
+            })
+            .catch((err) => {
+                console.error('Error loading product:', err);
+                setToast({ severity: 'error', message: 'Impossible de charger le produit' });
             })
             .finally(() => setLoading(false));
     };
@@ -141,14 +144,52 @@ const ProductForm = () => {
     };
 
     return (
-        <Paper elevation={1} sx={{ padding: 4 }}>
-            <Typography variant="h2" sx={{ marginBottom: 3, textAlign: 'center' }}>
+        <Paper
+            elevation={1}
+            sx={{
+                padding: { xs: 2, sm: 3, md: 4 },
+            }}
+        >
+            <Typography
+                variant="h2"
+                sx={{
+                    marginBottom: 3,
+                    textAlign: 'center',
+                    fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' },
+                }}
+            >
                 {isAddMode ? 'Ajouter un produit' : 'Modifier le produit'}
             </Typography>
 
-            <FormControl sx={{ display: 'block', ml: 'auto', mr: 'auto', width: '75%', mb: 3 }}>
-                <Divider>Nom du produit</Divider>
-                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4, mt: 2, mb: 6 }}>
+            <FormControl
+                sx={{
+                    display: 'block',
+                    ml: 'auto',
+                    mr: 'auto',
+                    width: { xs: '100%', sm: '90%', md: '75%' },
+                    mb: 3,
+                }}
+            >
+                <Divider
+                    sx={{
+                        '& .MuiDivider-wrapper': {
+                            whiteSpace: 'normal',
+                            textAlign: 'center',
+                            px: 1,
+                        },
+                    }}
+                >
+                    Nom du produit
+                </Divider>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        gap: { xs: 2, sm: 4 },
+                        mt: 2,
+                        mb: { xs: 4, sm: 6 },
+                    }}
+                >
                     <TextField
                         autoFocus
                         required
@@ -158,49 +199,81 @@ const ProductForm = () => {
                         fullWidth
                         error={!!errors.nameFr}
                         helperText={errors.nameFr}
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', sm: '50%' } }}
                     />
                     <TextField
-                        autoFocus
                         label="Nom en anglais"
                         value={getLocalizedProduct(product.localizedProducts, Locale.EN).name}
                         onChange={(e) => handleChange(Locale.EN, 'name', e.target.value)}
                         fullWidth
                         error={!!errors.nameEn}
                         helperText={errors.nameEn}
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', sm: '50%' } }}
                     />
                 </Box>
 
-                <Divider>Description</Divider>
-                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4, mt: 2, mb: 6 }}>
+                <Divider
+                    sx={{
+                        '& .MuiDivider-wrapper': {
+                            whiteSpace: 'normal',
+                            textAlign: 'center',
+                            px: 1,
+                        },
+                    }}
+                >
+                    Description
+                </Divider>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        gap: { xs: 2, sm: 4 },
+                        mt: 2,
+                        mb: { xs: 4, sm: 6 },
+                    }}
+                >
                     <TextField
-                        autoFocus
                         multiline
                         rows={2}
                         label="Description en français"
                         value={getLocalizedProduct(product.localizedProducts, Locale.FR).description}
                         onChange={(e) => handleChange(Locale.FR, 'description', e.target.value)}
                         fullWidth
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', sm: '50%' } }}
                     />
 
                     <TextField
-                        autoFocus
                         multiline
                         rows={2}
                         label="Description en anglais"
                         value={getLocalizedProduct(product.localizedProducts, Locale.EN).description}
                         onChange={(e) => handleChange(Locale.EN, 'description', e.target.value)}
                         fullWidth
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', sm: '50%' } }}
                     />
                 </Box>
 
-                <Divider>Informations supplémentaires</Divider>
-                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4, mt: 2, mb: 3 }}>
+                <Divider
+                    sx={{
+                        '& .MuiDivider-wrapper': {
+                            whiteSpace: 'normal',
+                            textAlign: 'center',
+                            px: 1,
+                        },
+                    }}
+                >
+                    Informations supplémentaires
+                </Divider>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        gap: { xs: 2, sm: 4 },
+                        mt: 2,
+                        mb: 3,
+                    }}
+                >
                     <TextField
-                        autoFocus
                         required
                         type="number"
                         label="Prix"
@@ -212,10 +285,10 @@ const ProductForm = () => {
                         }}
                         error={!!errors.price}
                         helperText={errors.price}
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', sm: '50%' } }}
                     />
 
-                    <Box sx={{ width: '50%' }}>
+                    <Box sx={{ width: { xs: '100%', sm: '50%' } }}>
                         <SelectPaginate
                             value={product.shop}
                             onChange={setShop}
@@ -239,7 +312,14 @@ const ProductForm = () => {
             </FormControl>
 
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Button variant="contained" onClick={handleSubmit}>
+                <Button
+                    variant="contained"
+                    onClick={handleSubmit}
+                    sx={{
+                        minWidth: { xs: '100%', sm: 200 },
+                        maxWidth: { xs: '100%', sm: 300 },
+                    }}
+                >
                     Valider
                 </Button>
             </Box>

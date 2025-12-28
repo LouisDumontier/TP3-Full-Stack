@@ -22,7 +22,9 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "products")
+@Table(name = "products", indexes = {
+        @Index(name = "idx_shop", columnList = "shop_id")
+})
 public class Product {
     @ManyToMany
     @JoinTable(name = "products_categories", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"), indexes = {
@@ -46,6 +48,7 @@ public class Product {
     private long price;
 
     @ManyToOne
+    @JoinColumn(name = "shop_id")
     private Shop shop;
 
     public List<Category> getCategories() {

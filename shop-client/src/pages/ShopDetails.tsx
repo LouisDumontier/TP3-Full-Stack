@@ -68,15 +68,22 @@ const ShopDetails = () => {
             elevation={1}
             sx={{
                 position: 'relative',
-                padding: 4,
+                padding: { xs: 1, sm: 3, md: 4 },
             }}
         >
             <ActionButtons handleDelete={handleDelete} handleEdit={handleEdit} />
 
-            <Typography variant="h3" sx={{ textAlign: 'center', marginBottom: 3 }}>
+            <Typography
+                variant="h3"
+                sx={{
+                    textAlign: 'center',
+                    marginBottom: 3,
+                    fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' },
+                }}
+            >
                 {shop.name}
             </Typography>
-            <Typography variant="h6">
+            <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                 Cette boutique comporte {shop.nbProducts} {pluralize('produit', shop.nbProducts)}
             </Typography>
             <Typography sx={{ my: 1 }}>
@@ -95,18 +102,26 @@ const ShopDetails = () => {
                     my: 4,
                 }}
             >
-                <Typography variant="h4" sx={{ mb: 2 }}>
+                <Typography
+                    variant="h4"
+                    sx={{
+                        mb: 2,
+                        fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' },
+                    }}
+                >
                     Horaires d&apos;ouverture :
                 </Typography>
                 {shop.openingHours.map((openingHour) => (
                     <Box
                         key={openingHour.id}
                         sx={{
-                            width: 200,
+                            width: { xs: '100%', sm: 250, md: 200 },
+                            maxWidth: 400,
                             display: 'flex',
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'space-between',
+                            px: { xs: 2, sm: 0 },
                         }}
                     >
                         <Typography sx={{ mb: 1.5 }}>{DAY[openingHour.day]}</Typography>
@@ -117,7 +132,14 @@ const ShopDetails = () => {
                 ))}
             </Box>
 
-            <Typography variant="h4" sx={{ textAlign: 'center', mb: 2 }}>
+            <Typography
+                variant="h4"
+                sx={{
+                    textAlign: 'center',
+                    mb: 2,
+                    fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' },
+                }}
+            >
                 Les produits :
             </Typography>
             {id && <ShopProducts shopId={id} />}
